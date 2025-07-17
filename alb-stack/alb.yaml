@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Load Balancer Stack
+
+Resources:
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: AnishALB
+      Subnets:
+        - !ImportValue Anish-Subnet1-ID
+        - !ImportValue Anish-Subnet2-ID
+      SecurityGroups:
+        - !ImportValue Anish-SG-ID
+      Scheme: internet-facing
+      Type: application
+      IpAddressType: ipv4
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: AnishTargetGroup
+      Port: 80
+      Protocol: HTTP
+      VpcId: !ImportValue Anish-VPC-ID
+      HealthCheckIntervalSeconds: 60
+      HealthCheckTimeoutSeconds: 8
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 4
+      TargetType: instance
+      HealthCheckPath: /
+    
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref ALB
+      Port: 80
+      Protocol: HTTP
+      healthcheckintervalseconds: 120
+
+Outputs:
+  AnishTargetGroupArn:
+    Value: !Ref TargetGroup
+    Export:
+      Name: Anish-TargetGroup-ARN
+
+  LoadBalancerDNS:
+    Value: !GetAtt ALB.DNSName
+    Export:
+      Name: Anish-ALB-DNS
