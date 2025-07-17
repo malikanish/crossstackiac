@@ -12,6 +12,15 @@ Parameters:
   AutoScalingGroupName:
     Type: String
     Default: AnishAutoScalingGroup
+  miniumumSize:
+    Type: Number
+    Default: 1
+  maximumSize:
+    Type: Number
+    Default: 2
+  desiredCapacity:
+    Type: Number
+    Default: 1
 Resources:
   LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -40,9 +49,9 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplate
         Version: !GetAtt LaunchTemplate.LatestVersionNumber
-      MinSize: 1
-      MaxSize: 2
-      DesiredCapacity: 1
+      MinSize: !Ref miniumumSize
+      MaxSize: !Ref maximumSize
+      DesiredCapacity: !Ref desiredCapacity
       TargetGroupARNs:
         - !ImportValue Anish-TargetGroup-ARN
       Tags:
